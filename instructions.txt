@@ -1,0 +1,47 @@
+Pre-requisitos
+ - docker
+ - docker compose
+ - git
+ - base de dados mysql tcgplace*
+ - rabbitmq**
+
+
+*, ** A base de dados e o rabbitmq podem ser instalados a partir do docker compose, repositório:
+https://github.com/cmiranda-ciandt/magic-cards
+
+
+Desafio
+
+  Migrar registros de cartas de magic a partir de uma base mysql para um arquivo txt.
+  Criar as seguintes rest services e queue listeners em python:
+
+  1. POST /movecards/:expansion_id
+        Obter todas as cartas (table magiccard) pelo id da expansão (expansion_id) informado como path parameter e postar no formato json cada uma das cartas no exchange "cards" do rabbitmq com um routingkey "moving_cards" . Ao final do processamento o serviço deve retornar o nome da expansão e quantas cartar foram postadas no exchange. Caso  seja informado um expansion_id invalido deve retornar HTTP 404 como status code.
+
+
+  2. Rabbit queue consumer
+        Criar um consumidor para a fila "cards" para ler cada uma das mensagens postadas no exchange pelo serviço do item anterior que deverá gravar as cartas em um arquivo /tmp/cards_db.txt no formato que achar pertinente.
+
+
+ 3. GET /moveall
+        Criar um serviço assíncrono que deve retornar 202 assim que for chamado e em background ler a tabela de expansion e acionar o serviço do item 1.
+
+
+ 4. GET /card/:card_id
+        Criar um serviço para obter as informações de um card gravado no arquivo "/tmp/cards_db.txt" pelo seu id
+
+
+ Atenção: a interpretação do desafio faz parte do desafio.
+                 O serviço python deve ser responsável por criar no rabbitmq exchange, bind e as filas utilizados no processo.
+                 Faz parte do desafio sincronizar a escrita das cartas no arquivo txt.
+                 É desejável que a busca de qualquer carta no arquivo físico, após o serviço /moveall ter sido executado, retorno no máximo em 500ms.
+
+
+Entrega
+
+    versionar o código em um repositório publico no git e enviar o link por email.
+
+Dicas
+Para iniciar a base de dados e rabbitmq: docker-compose up
+db connection: localhost:3306, user/pass: root
+para acessar o rabbit management: http://localhost:15672, user/pass: guest
