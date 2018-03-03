@@ -32,9 +32,9 @@ Desafio
 
 
  Atenção: a interpretação do desafio faz parte do desafio.
-                 O serviço python deve ser responsável por criar no rabbitmq exchange, bind e as filas utilizados no processo.
-                 Faz parte do desafio sincronizar a escrita das cartas no arquivo txt.
-                 É desejável que a busca de qualquer carta no arquivo físico, após o serviço /moveall ter sido executado, retorno no máximo em 500ms.
+          O serviço python deve ser responsável por criar no rabbitmq exchange, bind e as filas utilizados no processo.
+          Faz parte do desafio sincronizar a escrita das cartas no arquivo txt.
+          É desejável que a busca de qualquer carta no arquivo físico, após o serviço /moveall ter sido executado, retorno no máximo em 500ms.
 
 
 Entrega
