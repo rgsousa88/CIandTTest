@@ -21,8 +21,8 @@ WS_LOCALHOST = "0.0.0.0"
 WS_PORT = 8088
 
 #RABBITMQ CONFIGURATION
-RB_HOST = "127.0.0.1"
-RB_PORT = 15672
+RB_HOST = "localhost"
+RB_PORT = 5672
 RB_USER = "guest"
 RB_PASSWD = "guest"
 
@@ -84,17 +84,6 @@ def get_info_from_database(query='show_all_tables'):
 
 columns_name = get_columns_name("magiccard")
 
-credentials = pika.PlainCredentials(RB_USER,RB_PASSWD)
-parameters = pika.ConnectionParameters(RB_HOST,
-                                       RB_PORT,
-                                       '/',
-                                       credentials)
-
-connection = pika.BlockingConnection(parameters)
-channel = connection.channel()
-channel.queue_declare(queue='cards')
-
-
 app = flask.Flask("magicDeckServer")
 
 
@@ -115,6 +104,25 @@ def movecards(expansion_id):
     json_cards = make_json_card(columns_name,cards)
 
     #publish json_cards to exchange
+    credentials = pika.PlainCredentials(RB_USER,RB_PASSWD)
+    parameters = pika.ConnectionParameters(RB_HOST,
+                                           RB_PORT,
+                                           '/',
+                                           credentials)
+
+    connection = pika.BlockingConnection(parameters)
+    channel = connection.channel()
+    channel.queue_declare(queue='cards')
+
+
+    channel.exchange_declare(exchange='cards',
+                            exchange_type='direct')
+
+    for card in json_cards:
+        channel.basic_publish(exchange='cards',
+                              routing_key='moving_cards',
+                              body=card)
+
 
     sql_query = SQL_COMMANDS['select_name_expasion_table_magicexpansion'] + expansion_id
     cursor.execute(sql_query)
@@ -124,7 +132,7 @@ def movecards(expansion_id):
             "Posted Cards": len(cards)}
 
     db.close()
-    #connection.close()
+    connection.close()
     return flask.Response(response=json.dumps(ans),status=200)
     #pass
 #
