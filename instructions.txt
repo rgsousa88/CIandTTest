@@ -16,15 +16,23 @@ Desafio
   Criar as seguintes rest services e queue listeners em python:
 
   1. POST /movecards/:expansion_id
-        Obter todas as cartas (table magiccard) pelo id da expansão (expansion_id) informado como path parameter e postar no formato json cada uma das cartas no exchange "cards" do rabbitmq com um routingkey "moving_cards" . Ao final do processamento o serviço deve retornar o nome da expansão e quantas cartar foram postadas no exchange. Caso  seja informado um expansion_id invalido deve retornar HTTP 404 como status code.
+        Obter todas as cartas (table magiccard) pelo id da expansão (expansion_id)
+        informado como path parameter e postar no formato json cada uma das
+        cartas no exchange "cards" do rabbitmq com um routingkey "moving_cards".
+        Ao final do processamento o serviço deve retornar o nome da expansão e quantas
+        cartar foram postadas no exchange.
+        Caso  seja informado um expansion_id invalido deve retornar HTTP 404 como status code.
 
 
   2. Rabbit queue consumer
-        Criar um consumidor para a fila "cards" para ler cada uma das mensagens postadas no exchange pelo serviço do item anterior que deverá gravar as cartas em um arquivo /tmp/cards_db.txt no formato que achar pertinente.
+        Criar um consumidor para a fila "cards" para ler cada uma das mensagens
+        postadas no exchange pelo serviço do item anterior que deverá gravar as
+        cartas em um arquivo /tmp/cards_db.txt no formato que achar pertinente.
 
 
  3. GET /moveall
-        Criar um serviço assíncrono que deve retornar 202 assim que for chamado e em background ler a tabela de expansion e acionar o serviço do item 1.
+        Criar um serviço assíncrono que deve retornar 202 assim que for chamado
+        e em background ler a tabela de expansion e acionar o serviço do item 1.
 
 
  4. GET /card/:card_id
