@@ -9,6 +9,7 @@ import pandas as pd
 import celery
 import myutils as mu
 import json
+import lock as lk
 
 app = flask.Flask("magicDeckServer")
 
@@ -68,23 +69,42 @@ def moveall():
        e em background ler a tabela de expansion e acionar o serviço do item 1.
     """
 
-
     pass
 
 #
 @app.route('/card/<card_id>',methods=['GET'])
-def get_card_info():
+def get_card_info(card_id):
     """Criar um serviço para obter as informações de um card
        gravado no arquivo "/tmp/cards_db.txt" pelo seu id
     """
+    columns_name = mu.get_columns_name("magiccard")
+    query_card = {}
 
-    #pd.read_csv('')
+    try:
+        lock = lk.Lock("/tmp/lock_name.tmp")
+        lock.acquire()
+        dtFrame = pd.read_csv(mu.LOCAL_DB_FILE,
+                             delimiter=' ;',
+                             quotechar='"',
+                             header=None,
+                             engine='python')
 
-    pass
+        dtFrame.columns = columns_name
+        mask=(dtFrame['GathererId']=='"'+card_id+'"')
+        query_card = dtFrame[mask]
 
-#get_info_from_database('show_columns_names_table_magicexpansion')
+        for column in columns_name:
+            query_card[column].replace(to_replace=r'[\"]',value="",regex=True,inplace=True)
 
-#db.close()
+        if(query_card.empty):
+            ans = "GathererId " + card_id + " not found."
+            return flask.Response(response=ans,status=404)
+    finally:
+        lock.release()
+
+    return flask.Response(response=json.dumps(json.loads(query_card.to_json(orient='records')), indent=2),
+                          status=200)
+
 
 if __name__ == '__main__':
     app.run(host=mu.WS_LOCALHOST, port=mu.WS_PORT)

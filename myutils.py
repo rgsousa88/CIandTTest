@@ -3,6 +3,7 @@
 
 import MySQLdb
 import json
+from collections import OrderedDict
 
 #DATABASE CONFIGURATION
 DB_HOST = "127.0.0.1"
@@ -46,8 +47,9 @@ def make_connection():
 # Return list of json cards
 def make_json_card(columns_name,cards):
     list_json_cards = []
+
     for card in cards:
-        dict_card = dict(zip(columns_name,list(card)))
+        dict_card = OrderedDict(zip(columns_name,list(card)))
         list_json_cards.append(json.dumps(dict_card))
 
     return list_json_cards

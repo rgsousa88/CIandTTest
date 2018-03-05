@@ -8,6 +8,7 @@ import celery
 import re
 import myutils as mu
 import lock as lk
+from collections import OrderedDict
 
 
 credentials = pika.PlainCredentials(mu.RB_USER,mu.RB_PASSWD)
@@ -31,7 +32,8 @@ channel.queue_bind(exchange='cards',
 print(' [*] Waiting for cards. To exit press CTRL+C')
 
 def callback(ch, method, properties, body):
-    card = json.loads(body.decode('utf-8'))
+    card = json.loads(body.decode('utf-8'),
+                      object_pairs_hook=OrderedDict)
     print("Receiving card...")
 
     try:
@@ -39,7 +41,9 @@ def callback(ch, method, properties, body):
         lock.acquire()
         with open(mu.LOCAL_DB_FILE,'a') as file:
             values = list(card.values())
-            file.write(";".join(str(value) for value in values))
+            string = " ".join(";" + '"' + str(value) + '"' for value in values)
+            print(string[1:])
+            file.write(string[1:])
             file.write('\n')
     finally:
         lock.release()
