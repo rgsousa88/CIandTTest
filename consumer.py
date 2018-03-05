@@ -41,9 +41,9 @@ def callback(ch, method, properties, body):
         lock.acquire()
         with open(mu.LOCAL_DB_FILE,'a') as file:
             values = list(card.values())
-            string = " ".join(";" + '"' + str(value) + '"' for value in values)
-            print(string[1:])
-            file.write(string[1:])
+            string = "".join(",," + str(value) for value in values)
+            print(string[2:])
+            file.write(string[2:])
             file.write('\n')
     finally:
         lock.release()

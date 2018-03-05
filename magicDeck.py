@@ -12,6 +12,17 @@ import lock as lk
 
 app = flask.Flask("magicDeckServer")
 
+#@celery.task(bind=True)
+def background_task():
+    list_expansion_ids = mu.get_info_from_database(query='select_all_id_expasion_table_magicexpansion')
+
+    for expansion_id in list_expansion_ids:
+        #calls movecards
+        print("SENDING %d"%(expansion_id))
+        movecards(expansion_id=str(expansion_id))
+
+
+
 @app.route('/movecards/<expansion_id>',methods=['POST'])
 def movecards(expansion_id):
     db = mu.make_connection()
@@ -68,8 +79,9 @@ def moveall():
     """Criar um serviço assíncrono que deve retornar 202 assim que for chamado
        e em background ler a tabela de expansion e acionar o serviço do item 1.
     """
-    mu.get_info_from_database(query='select_all_columns_table_magicexpansion')
 
+    #task = background_task.apply_async()
+    background_task()
 
     return flask.Response(response={"202 - Accepted"},status=202)
 
@@ -87,13 +99,10 @@ def get_card_info(card_id):
         lock = lk.Lock("/tmp/lock_name.tmp")
         lock.acquire()
         dtFrame = pd.read_csv(mu.LOCAL_DB_FILE,
-                             delimiter=' ;',
-                             quotechar='"',
+                             delimiter=",,",
                              header=None,
                              names=columns_name,
                              engine='python')
-
-        dtFrame.replace({r'[\"]': ""}, regex=True,inplace=True)
 
         query_card = dtFrame.query('GathererId == @card_id')
         print("RES")

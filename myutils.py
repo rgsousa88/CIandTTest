@@ -33,6 +33,7 @@ SQL_COMMANDS = {'show_all_tables':"SHOW TABLES",
                'select_all_columns_table_magiccard':"SELECT * FROM magiccard",
                'select_all_columns_table_magicexpansion':"SELECT * FROM magicexpansion",
                'select_id_expasion_table_magiccard':"SELECT * FROM magiccard WHERE ExpansionId=",
+               'select_all_id_expasion_table_magicexpansion':"SELECT ExpansionId FROM magicexpansion",
                'select_name_expasion_table_magicexpansion':"SELECT Name FROM magicexpansion WHERE ExpansionId="}
 
 # Conecting to database in DB_HOST:DB_PORT as DB_USER:DB_PASSWD
@@ -73,7 +74,10 @@ def get_info_from_database(query='show_all_tables'):
     cursor = db.cursor()
     cursor.execute(SQL_COMMANDS[query])
 
-    for row in cursor.fetchall():
-        print(row)
+    query_info = []
+    for row in list(cursor):
+        #print(row)
+        query_info.append(row[0])
 
     db.close()
+    return query_info
