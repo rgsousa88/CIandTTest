@@ -31,6 +31,7 @@ SQL_COMMANDS = {'show_all_tables':"SHOW TABLES",
                'show_columns_names_table_magiccard':"SHOW COLUMNS FROM magiccard",
                'show_columns_names_table_magicexpansion':"SHOW COLUMNS FROM magicexpansion",
                'select_all_columns_table_magiccard':"SELECT * FROM magiccard",
+               'select_all_columns_table_magicexpansion':"SELECT * FROM magicexpansion",
                'select_id_expasion_table_magiccard':"SELECT * FROM magiccard WHERE ExpansionId=",
                'select_name_expasion_table_magicexpansion':"SELECT Name FROM magicexpansion WHERE ExpansionId="}
 

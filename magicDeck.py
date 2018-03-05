@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-
 import flask
 import requests
 import pika
@@ -69,7 +68,9 @@ def moveall():
     """Criar um serviço assíncrono que deve retornar 202 assim que for chamado
        e em background ler a tabela de expansion e acionar o serviço do item 1.
     """
-    
+    mu.get_info_from_database(query='select_all_columns_table_magicexpansion')
+
+
     return flask.Response(response={"202 - Accepted"},status=202)
 
 
@@ -89,14 +90,14 @@ def get_card_info(card_id):
                              delimiter=' ;',
                              quotechar='"',
                              header=None,
+                             names=columns_name,
                              engine='python')
 
-        dtFrame.columns = columns_name
-        mask=(dtFrame['GathererId']=='"'+card_id+'"')
-        query_card = dtFrame[mask]
+        dtFrame.replace({r'[\"]': ""}, regex=True,inplace=True)
 
-        for column in columns_name:
-            query_card[column].replace(to_replace=r'[\"]',value="",regex=True,inplace=True)
+        query_card = dtFrame.query('GathererId == @card_id')
+        print("RES")
+        print(query_card)
 
         if(query_card.empty):
             ans = "GathererId " + card_id + " not found."
@@ -104,8 +105,8 @@ def get_card_info(card_id):
     finally:
         lock.release()
 
-    return flask.Response(response=json.dumps(json.loads(query_card.to_json(orient='records')), indent=2),
-                          status=200)
+    ans = json.dumps(json.loads(query_card.to_json(orient='records')), indent=2)
+    return flask.Response(response=ans,status=200)
 
 
 if __name__ == '__main__':
