@@ -46,6 +46,7 @@ def movecards(expansion_id):
                             exchange_type='direct')
 
     for card in json_cards:
+        print("SENDING...")
         channel.basic_publish(exchange='cards',
                               routing_key='moving_cards',
                               body=card)
