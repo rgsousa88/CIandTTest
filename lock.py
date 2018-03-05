@@ -4,6 +4,8 @@
 import os
 import fcntl
 
+# Implementation took from http://blog.vmfarms.com/2011/03/cross-process-locking-and.html
+
 class Lock:
 
     def __init__(self, filename):
