@@ -69,8 +69,9 @@ def moveall():
     """Criar um serviço assíncrono que deve retornar 202 assim que for chamado
        e em background ler a tabela de expansion e acionar o serviço do item 1.
     """
+    
+    return flask.Response(response={"202 - Accepted"},status=202)
 
-    pass
 
 #
 @app.route('/card/<card_id>',methods=['GET'])
