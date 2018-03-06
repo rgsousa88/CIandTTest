@@ -9,9 +9,6 @@ import json
 import lock as lk
 from myutils import async
 
-
-broker = 'amqp://guest:guest@127.0.0.1:5672'
-
 app = flask.Flask("magicDeckServer")
 
 @async
