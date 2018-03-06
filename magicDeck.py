@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import flask
-import requests
 import pika
 import pandas as pd
 import myutils as mu
