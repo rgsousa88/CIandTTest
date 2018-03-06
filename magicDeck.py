@@ -5,22 +5,25 @@ import flask
 import requests
 import pika
 import pandas as pd
-import celery
 import myutils as mu
 import json
 import lock as lk
+from myutils import async
+
+
+broker = 'amqp://guest:guest@127.0.0.1:5672'
 
 app = flask.Flask("magicDeckServer")
 
-#@celery.task(bind=True)
+@async
 def background_task():
     list_expansion_ids = mu.get_info_from_database(query='select_all_id_expasion_table_magicexpansion')
 
     for expansion_id in list_expansion_ids:
-        #calls movecards
         print("SENDING %d"%(expansion_id))
         movecards(expansion_id=str(expansion_id))
 
+    return 0
 
 
 @app.route('/movecards/<expansion_id>',methods=['POST'])
@@ -79,14 +82,10 @@ def moveall():
     """Criar um serviço assíncrono que deve retornar 202 assim que for chamado
        e em background ler a tabela de expansion e acionar o serviço do item 1.
     """
-
-    #task = background_task.apply_async()
-    background_task()
-
+    task = background_task()
     return flask.Response(response={"202 - Accepted"},status=202)
 
 
-#
 @app.route('/card/<card_id>',methods=['GET'])
 def get_card_info(card_id):
     """Criar um serviço para obter as informações de um card

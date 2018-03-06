@@ -4,6 +4,7 @@
 import MySQLdb
 import json
 from collections import OrderedDict
+from threading import Thread
 
 #DATABASE CONFIGURATION
 DB_HOST = "127.0.0.1"
@@ -81,3 +82,9 @@ def get_info_from_database(query='show_all_tables'):
 
     db.close()
     return query_info
+
+def async(f):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper
