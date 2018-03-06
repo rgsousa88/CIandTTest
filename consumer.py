@@ -2,10 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pika
-import pandas as pd
 import json
-import celery
-import re
 import myutils as mu
 import lock as lk
 from collections import OrderedDict
