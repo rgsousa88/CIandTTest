@@ -92,7 +92,7 @@ def get_card_info(card_id):
        gravado no arquivo "/tmp/cards_db.txt" pelo seu id
     """
     columns_name = mu.get_columns_name("magiccard")
-    query_card = {}
+    query_card = pd.DataFrame()
 
     try:
         lock = lk.Lock("/tmp/lock_name.tmp")
@@ -104,17 +104,18 @@ def get_card_info(card_id):
                              engine='python')
 
         query_card = dtFrame.query('GathererId == @card_id')
-        print("RES")
-        print(query_card)
 
-        if(query_card.empty):
-            ans = "GathererId " + card_id + " not found."
-            return flask.Response(response=ans,status=404)
     finally:
         lock.release()
 
-    ans = json.dumps(json.loads(query_card.to_json(orient='records')), indent=2)
-    return flask.Response(response=ans,status=200)
+    if(query_card.empty):
+        ans = "GathererId " + card_id + " not found."
+        status = 400
+    else:
+        ans = json.dumps(json.loads(query_card.to_json(orient='records')), indent=2)
+        status = 200
+
+    return flask.Response(response=ans,status=status)
 
 
 if __name__ == '__main__':
